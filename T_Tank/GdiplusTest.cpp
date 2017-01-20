@@ -2,7 +2,7 @@
 #include "fstream"
 #include "stdio.h"
 #include "iostream"
-
+#include <cassert>
 using namespace std;
 
 
@@ -151,24 +151,42 @@ void GdiplusTest::LoadMap()
 	back->SetUpdate(true);
 	
 	//读取地图文件
-	char ch;
 	int map_date[1000] = {0};
-	int tmp = 0,i=0;
-	ifstream myfile("map/map.txt");
-	while (!myfile.eof())
+	ifstream infile;
+	infile.open("C:\\Users\\WF\\Documents\\test.txt");   //将文件流对象与文件连接起来 
+	assert(infile.is_open());                            //若失败,则输出错误消息,并终止程序运行 
+	string s, wall_data = "";
+	while (getline(infile, s))
 	{
-		myfile >> ch;
-		if (ch >= '0' && ch <= '9')
+		if (s == "[layer]")
 		{
-			tmp = tmp * 10 + ch - '0';
-		}
-		else if (ch == ',')
-		{
-			map_date[i++] = tmp;
-			tmp = 0;
+			while (getline(infile, s))
+			{
+				if (s == "type=wall")
+				{
+					while (getline(infile, s))
+					{
+						wall_data += s;
+					}
+				}
+			}
 		}
 	}
-	myfile.close();
+	infile.close();             //关闭文件输入流 
+	int num = 0, index = 0,len = wall_data.length();
+	for (int i = 0; i < len; ++i)
+	{
+		if (wall_data[i] >= '0' && wall_data[i] <= '9')
+		{
+			num = num * 10 + wall_data[i] - '0';
+		}
+		if (wall_data[i] == ',' || i == len-1)
+		{
+			map_date[index++] = num;
+			num = 0;
+		}
+	}
+
 
 	//障碍层
 	for (int i = 0; i < MAP_ROWS*MAP_COLS; ++i)

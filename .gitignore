@@ -1,7 +1,3 @@
-.vs
-*.sdf
-*.sln
-*.suo
-*.db
-Debug/*
-Release/*
+/*
+!.gitignore
+!/T_Tank
