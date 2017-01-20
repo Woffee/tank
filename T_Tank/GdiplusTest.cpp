@@ -153,7 +153,7 @@ void GdiplusTest::LoadMap()
 	//读取地图文件
 	int map_date[1000] = {0};
 	ifstream infile;
-	infile.open("C:\\Users\\WF\\Documents\\test.txt");   //将文件流对象与文件连接起来 
+	infile.open(".\\map\\map.txt");   //将文件流对象与文件连接起来 
 	assert(infile.is_open());                            //若失败,则输出错误消息,并终止程序运行 
 	string s, wall_data = "";
 	while (getline(infile, s))
