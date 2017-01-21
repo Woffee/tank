@@ -1,4 +1,5 @@
 #include "GdiplusTest.h"
+#include "T_GameConfig.h"
 #include "fstream"
 #include "stdio.h"
 #include "iostream"
@@ -57,6 +58,7 @@ GdiplusTest::GdiplusTest(HINSTANCE h_instance, LPCTSTR sz_winclass, LPCTSTR sz_t
 // 游戏显示(参数值为GameState)
 void GdiplusTest::GamePaint(HDC hdc)
 {
+
 	back->Draw(hdc);
 	barrier->Draw(hdc);
 	vSpriteSet::iterator p;
@@ -135,70 +137,23 @@ void GdiplusTest::LoadMap()
 		back_data.push_back(row_data);
 	}
 	
-	//背景
-	for (int r = 0; r < MAP_ROWS; ++r)
-	{
-		for (int c = 0; c < MAP_COLS; ++c)
-		{
-			back_data[r][c] = MAP_BKG;
-		}
-	}
+	//读取地图文件
+	string filePath = ".\\map\\map.txt";
+	T_GameConfig config;
+	config.readConfig(filePath);
 
+	//背景
 	mapInfo.type_id = LAYER_MAP_BACK;
 	mapInfo.data = back_data;
+	config.getLayerData(LAYER_MAP_BACK, mapInfo.data, MAP_ROWS, MAP_COLS);
 	back = new T_Map(mapInfo);
 	back->SetPosition(0, 0);
 	back->SetUpdate(true);
 	
-	//读取地图文件
-	int map_date[1000] = {0};
-	ifstream infile;
-	infile.open(".\\map\\map.txt");   //将文件流对象与文件连接起来 
-	assert(infile.is_open());                            //若失败,则输出错误消息,并终止程序运行 
-	string s, wall_data = "";
-	while (getline(infile, s))
-	{
-		if (s == "[layer]")
-		{
-			while (getline(infile, s))
-			{
-				if (s == "type=wall")
-				{
-					while (getline(infile, s))
-					{
-						wall_data += s;
-					}
-				}
-			}
-		}
-	}
-	infile.close();             //关闭文件输入流 
-	int num = 0, index = 0,len = wall_data.length();
-	for (int i = 0; i < len; ++i)
-	{
-		if (wall_data[i] >= '0' && wall_data[i] <= '9')
-		{
-			num = num * 10 + wall_data[i] - '0';
-		}
-		if (wall_data[i] == ',' || i == len-1)
-		{
-			map_date[index++] = num;
-			num = 0;
-		}
-	}
-
-
-	//障碍层
-	for (int i = 0; i < MAP_ROWS*MAP_COLS; ++i)
-	{
-		int col = i%MAP_COLS;
-		int row = i / MAP_COLS;
-		barrier_data[row][col] = map_date[i];
-	}
-
+	//障碍物
 	mapInfo.type_id = LAYER_MAP_BARR;
 	mapInfo.data = barrier_data;
-	
+	config.getLayerData(LAYER_MAP_BARR, mapInfo.data ,MAP_ROWS,MAP_COLS);
 	barrier = new T_Map(mapInfo);
 	barrier->SetPosition(0, 0);
 	barrier->SetUpdate(true);
